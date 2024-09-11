@@ -54,5 +54,3 @@ select distinct giorno
 from AttivitaNonProgettuale
 where tipo = 'Didattica'
 order by giorno asc;
-
-
