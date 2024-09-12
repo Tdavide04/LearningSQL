@@ -21,16 +21,18 @@ select nome, cognome
 from Persona
 where persona.posizione in ('Professore Associato', 'Professore Ordinario') and cognome like 'V%';
 
+
 -- 5. Quali sono i Progetti già terminati alla data odierna?
 
-select fine
-from Progetto;
+select *
+from Progetto
+where fine < CURRENT_DATE;
 
 -- 6. Quali sono i nomi di tutti i Progetti ordinati in ordine crescente di data di inizio?
 
 select nome
 from Progetto
-order by nome asc
+order by inizio asc
 
 -- 7. Quali sono i nomi dei WP ordinati in ordine crescente (per nome)?
 
