@@ -51,7 +51,9 @@ create table Riparazione (
     riconsegna timestamp,
     codice integer not null,
     inizio timestamp not null,
+    officina varchar not null 
     primary key (codice)
+    foreign key (officina) references Officina (id)
 );
 
 CREATE Domain String100_not_null AS varchar(100) CHECK (value IS NOT NULL);
@@ -65,9 +67,10 @@ create table Officina (
     nome varchar not null,
     id integer not null,
     indirizzo Indirizzo not null,
-    riparazione varchar not null,
     citta varchar not null,
+    regione varchar not null,
+    nazione varchar not null,
     primary key (id),
-    foreign key (riparazione) references Riparazione (codice)
+    foreign key (citta, regione, nazione) references Citta (nome, regione, nazione)
 );
 
