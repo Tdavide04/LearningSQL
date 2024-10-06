@@ -42,7 +42,9 @@ create table Veicolo (
     immatricolazione integer not null,
     modello varchar not null,
     marca varchar not null,
+    cliente varchar not null,
     primary key (targa),
+    foreign key (cliente) references Cliente (cf)
     foreign key (modello, marca) references Modello (nome, marca)
 
 );
@@ -74,3 +76,43 @@ create table Officina (
     foreign key (citta, regione, nazione) references Citta (nome, regione, nazione)
 );
 
+create domain codicefiscale as varchar(16)
+    check (value ~ '^[A-Z0-9]{16}$');
+
+create table Persona (
+    cf codFis not null,
+    nome varchar not null,
+    indirizzo Indirizzo not null,
+    telefono varchar not null,
+    citta varchar not null,
+    regione varchar not null,
+    nazione varchar not null,
+    primary key (cf)
+    foreign  key (citta, regione, nazione) references citta(nome, nazione, regione)
+);
+
+create table Cliente ( 
+    persona varchar not null,
+    primary key (persona),
+    foreign key (persona) references Persona (cf) 
+);
+
+create table Staff (
+    persona varchar not null,
+    primary key (persona),
+    foreign key (persona) references Persona (cf)
+);
+
+create table Direttore (
+    nascita date not null,
+    staff varchar not null,
+    primary key (staff),
+    foreign key (staff) references Staff (persona)
+);
+
+create table Dipendente (
+    persona varchar not null,
+    lavora date not null,
+    primary key (persona),
+    foreign key (persona) references Persona (cf)
+)
