@@ -77,11 +77,23 @@ CREATE TABLE Assenza (
 -- Query:
 -- 1. Quali sono il nome, la data di inizio e la data di fine dei WP del progetto di nome 'Pegasus' ?
 
-select
-from 
-where
+select wp.id, wp.nome, wp.inizio, wp.fine
+from WP wp, Progetto p
+where p.nome = 'Pegasus' and wp.progetto = p.id;
 
 -- 2. Quali sono il nome, il cognome e la posizione degli strutturati che hanno almeno una attività nel progetto ‘Pegasus’, ordinati per cognome decrescente?
+
+with nome_progetto as (
+    select id
+    from Progetto 
+    where nome = 'Pegasus'
+)
+select distinct p.id, p.nome, p.cognome, p.posizione
+from Persona p, nome_progetto, AttivitaProgetto ap
+where p.id = ap.persona and nome_progetto.id = ap.progetto
+order by p.cognome desc;
+
+
 -- 3. Quali sono il nome, il cognome e la posizione degli strutturati che hanno più di una attività nel progetto ‘Pegasus’ ?
 -- 4. Quali sono il nome, il cognome e la posizione dei Professori Ordinari che hanno fatto almeno una assenza per malattia?
 -- 5. Quali sono il nome, il cognome e la posizione dei Professori Ordinari che hanno fatto più di una assenza per malattia?
