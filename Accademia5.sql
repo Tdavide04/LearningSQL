@@ -145,8 +145,25 @@ where p.id = ap.persona and p.id = anp.persona and ap.giorno = anp.giorno
 
 -- 9. Quali sono il nome e il cognome degli strutturati che nello stesso giorno hanno sia attività progettuali che attività non progettuali? Si richiede anche di proiettare il giorno, il nome del progetto, il tipo di attività non progettuali e la durata in ore di entrambe le attività.
 
-
+select distinct p.id, p.nome, p.cognome, ap.giorno, pr.nome, anp.tipo, ap.oreDurata, anp.oreDurata
+from Persona p, AttivitaProgetto ap, AttivitaNonProgettuale anp, Progetto pr
+where p.id = ap.persona and p.id = anp.persona and ap.giorno = anp.giorno and ap.progetto = pr.id
 
 -- 10. Quali sono il nome e il cognome degli strutturati che nello stesso giorno sono assenti e hanno attività progettuali?
+
+select distinct p.id, p.nome, p.cognome
+from Persona p, Assenza a, AttivitaNonProgettuale anp
+where p.id = a.persona and p.id = anp.persona and a.giorno = anp.giorno
+
 -- 11. Quali sono il nome e il cognome degli strutturati che nello stesso giorno sono assenti e hanno attività progettuali? Si richiede anche di proiettare il giorno, il nome del progetto, la causa di assenza e la durata in ore della attività progettuale.
+
+select distinct p.id, p.nome, p.cognome, ap.giorno, pr.nome, a.tipo, ap.oreDurata
+from Persona p, Assenza a, AttivitaProgetto ap, Progetto pr
+where p.id = a.persona and p.id = ap.persona and a.giorno = ap.giorno and pr.id = ap.progetto
+
 -- 12. Quali sono i WP che hanno lo stesso nome, ma appartengono a progetti diversi?
+
+SELECT nome
+FROM WP
+GROUP BY nome
+HAVING COUNT(DISTINCT progetto) > 1;
