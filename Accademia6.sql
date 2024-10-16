@@ -77,71 +77,75 @@ CREATE TABLE Assenza (
 -- Query 
 -- 1. Quanti sono gli strutturati di ogni fascia?
 
-select posizione, COUNT(*)
-from Persona
-GROUP BY posizione;
+select p.posizione, count(*)
+from Persona p
+where True
+group by p.posizione
 
 -- 2. Quanti sono gli strutturati con stipendio ≥ 40000?
 
-select COUNT(*)
-from Persona
-where (stipendio >= 40000 );
+select count(*)
+from Persona p
+where p.stipendio >= 40000
 
 -- 3. Quanti sono i progetti già finiti che superano il budget di 50000?
 
-select COUNT(*) 
-from Progetto
-where fine < CURRENT_DATE AND budget > 50000;
+select count(*)
+from Progetto pr
+where pr.budget > 50000 and pr.fine < current_date
 
 -- 4. Qual è la media, il massimo e il minimo delle ore delle attività relative al progetto ‘Pegasus’ ?
 
-select 
-    AVG(oreDurata),
-    MAX(oreDurata),
-    MIN(oreDurata)
-from AttivitaProgetto, Progetto as p
-where progetto = p.id and p.nome = 'Pegasus';
+select avg(ap.oreDurata), max(ap.oreDurata), min(ap.oreDurata)
+from Progetto pr, AttivitaProgetto ap
+where pr.nome = 'Pegasus' and ap.progetto = pr.id
 
--- 5. Quali sono le medie, i massimi e i minimi delle ore giornaliere dedicate al progetto ‘Pegasus’ da ogni singolo docente? (non funziona)
+-- 5. Quali sono le medie, i massimi e i minimi delle ore giornaliere dedicate al progetto ‘Pegasus’ da ogni singolo docente? 
 
-select 
-    per.nome
-    per.id
-    AVG(oreDurata),
-    MAX(oreDurata),
-    MIN(oreDurata)
-from AttivitaProgetto, Progetto as pro, Persona as per
-where progetto = pro.id and pro.nome = 'Pegasus';
+select p.id, p.nome, p.cognome, avg(ap.oreDurata), max(ap.oreDurata), min(ap.oreDurata)
+from Persona p, AttivitaProgetto ap, Progetto pr
+where pr.nome = 'Pegasus' and ap.progetto = pr.id and ap.persona = p.id
+group by p.id
 
--- 6. Qual è il numero totale di ore dedicate alla didattica da ogni docente? (non funziona)
+-- 6. Qual è il numero totale di ore dedicate alla didattica da ogni docente?
 
-select SUM(oreDurata), p.id, p.nome, p.cognome
-from AttivitaNonProgettuale, Persona as p
-where tipo = 'Didattica'
-group by persona;
+select p.id, p.nome, p.cognome, count(anp.oreDurata)
+from Persona p, AttivitaNonProgettuale anp
+where anp.persona = p.id and anp.tipo = 'Didattica'
+group by p.id
 
 -- 7. Qual è la media, il massimo e il minimo degli stipendi dei ricercatori?
 
-select 
-    AVG(stipendio),
-    MAX(stipendio),
-    MIN(stipendio)
-from Persona
-where posizione = 'Ricercatore';
+select avg(p.stipendio), max(p.stipendio), min(p.stipendio)
+from Persona p
+where p.posizione = 'Ricercatore'
 
 -- 8. Quali sono le medie, i massimi e i minimi degli stipendi dei ricercatori, dei professori associati e dei professori ordinari?
 
-select 
-    posizione,
-    AVG(stipendio),
-    MAX(stipendio),
-    MIN(stipendio)
-from Persona
-where posizione in ('Ricercatore', 'Professore Associato', 'Professore Ordinario')
-group by posizione;
+select p.posizione, avg(p.stipendio), max(p.stipendio), min(p.stipendio)
+from Persona p
+where True
+group by p.posizione
 
 -- 9. Quante ore ‘Ginevra Riva’ ha dedicato ad ogni progetto nel quale ha lavorato?
 
+select pr.id, pr.nome, sum(ap.oreDurata)
+from Persona p, Progetto pr, AttivitaProgetto ap
+where p.nome = 'Ginevra' and p.cognome = 'Riva' and ap.progetto = pr.id and p.id = ap.persona
+group by pr.id
+
 -- 10. Qual è il nome dei progetti su cui lavorano più di due strutturati?
 
+select pr.id, pr.nome 
+from Persona p, Progetto pr, AttivitaProgetto ap
+where pr.id = ap.progetto and ap.persona = p.id
+group by pr.id
+having count(p.posizione) > 2
+
 -- 11. Quali sono i professori associati che hanno lavorato su più di un progetto?
+
+select p.id, p.nome, p.cognome
+from Persona p, Progetto pr, AttivitaProgetto ap
+where p.id = ap.persona and ap.progetto = pr.id and p.posizione = 'Professore Associato'
+group by p.id
+having count(pr.nome) >= 2
