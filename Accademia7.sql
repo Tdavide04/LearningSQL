@@ -94,7 +94,46 @@ from Persona p, categoria_persona cp
 where p.posizione = 'Ricercatore' and p.stipendio > cp.media
 
 -- 3. Per ogni categoria di strutturati quante sono le persone con uno stipendio che differisce di al massimo una deviazione standard dalla media della loro categoria?
+
+select p.posizione, count(*)
+from Persona p
+where stipendio >= (select avg(stipendio) - stddev(stipendio) 
+                    from Persona p2 
+                    where p2.posizione = p.posizione)
+and stipendio <=   (select avg(stipendio) + stddev(stipendio) 
+                    from Persona p2 
+                    where p2.posizione = p.posizione)
+group by p.posizione;
+
 -- 4. Chi sono gli strutturati che hanno lavorato almeno 20 ore complessive in attività progettuali? Restituire tutti i loro dati e il numero di ore lavorate.
+
+select p.*, sum(ap.oreDurata)
+from Persona p
+join AttivitaProgetto ap on p.id = ap.persona
+group by p.id
+having sum(oreDurata) > 20;
+
 -- 5. Quali sono i progetti la cui durata è superiore alla media delle durate di tutti i progetti? Restituire nome dei progetti e loro durata in giorni.
+
+select nome, (fine - inizio)
+from Progetto
+where (fine - inizio) > (select avg(fine - inizio) from Progetto);
+
 -- 6. Quali sono i progetti terminati in data odierna che hanno avuto attività di tipo “Dimostrazione”? Restituire nome di ogni progetto e il numero complessivo delle ore dedicate a tali attività nel progetto.
+
+select p.id, p.nome, sum(ap.oreDurata)
+from Progetto p
+join AttivitaProgetto ap on p.id = ap.progetto
+where ap.tipo = 'Dimostrazione'
+group by p.id
+
 -- 7. Quali sono i professori ordinari che hanno fatto più assenze per malattia del numero di assenze medio per malattia dei professori associati? Restituire id, nome e cognome del professore e il numero di giorni di assenza per malattia.
+
+select p.*
+from Persona p
+join Assenza a on p.id = persona
+where p.posizione = 'Professore Ordinario' and a.tipo = 'Malattia'
+group by p.id
+having count(a.tipo = 'Malattia') > (select avg(p.id) from Persona p, Assenza a where p.posizione 'Professore Associato');
+
+
